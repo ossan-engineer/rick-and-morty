@@ -22,17 +22,29 @@ const App = (): JSX.Element => {
     });
   };
 
-  const toggleFavAction = (episode: IEpisode) =>
-    dispatch({
+  const toggleFavAction = (episode: IEpisode): IAction => {
+    const episodeInFav = state.favorites.includes(episode);
+    let dispatchObj = {
       type: "ADD_FAV",
       payload: episode
-    });
+    };
+    if (episodeInFav) {
+      dispatchObj = {
+        type: "REMOVE_FAV",
+        payload: episode
+      };
+    }
+    return dispatch(dispatchObj);
+  };
 
   return (
     <>
       <header className="header">
-        <h1>Rick and Morty</h1>
-        <p>Pick your favorite episode!</p>
+        <div>
+          <h1>Rick and Morty</h1>
+          <p>Pick your favorite episode!</p>
+        </div>
+        <div>Favorites: {state.favorites.length}</div>
       </header>
       <section className="episode-layout">
         {state.episodes.map((episode: IEpisode) => (
@@ -48,7 +60,11 @@ const App = (): JSX.Element => {
                 Number: {episode.number}
               </div>
               <button type="button" onClick={() => toggleFavAction(episode)}>
-                Fav
+                {state.favorites.find(
+                  (favorite: IEpisode) => favorite.id === episode.id
+                )
+                  ? "Unfav"
+                  : "Fav"}
               </button>
             </div>
           </div>

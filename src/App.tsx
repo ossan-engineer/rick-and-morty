@@ -1,25 +1,11 @@
 import React, { Component, useContext } from "react";
 import { Store } from "./Store";
-
-interface IEpisode {
-  airdate: string;
-  airstamp: string;
-  airtime: string;
-  id: number;
-  image: {
-    medium: string;
-    original: string;
-  };
-  name: string;
-  number: number;
-  runtime: number;
-  season: number;
-  summary: string;
-  url: string;
-}
+import { IAction, IEpisode } from "./interfaces";
 
 const App = (): JSX.Element => {
   const { state, dispatch } = React.useContext(Store);
+
+  console.log(state);
 
   React.useEffect(() => {
     state.episodes.length === 0 && fetchDataAction();
@@ -35,7 +21,13 @@ const App = (): JSX.Element => {
       payload: dataJSON._embedded.episodes
     });
   };
-  console.log(state);
+
+  const toggleFavAction = (episode: IEpisode) =>
+    dispatch({
+      type: "ADD_FAV",
+      payload: episode
+    });
+
   return (
     <>
       <header className="header">
@@ -51,8 +43,13 @@ const App = (): JSX.Element => {
             />
             <div>{episode.name}</div>
             <div>
-              Season: {episode.season}
-              Number: {episode.number}
+              <div>
+                Season: {episode.season}
+                Number: {episode.number}
+              </div>
+              <button type="button" onClick={() => toggleFavAction(episode)}>
+                Fav
+              </button>
             </div>
           </div>
         ))}

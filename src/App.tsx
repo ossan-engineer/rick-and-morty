@@ -1,49 +1,9 @@
 import React, { Component, useContext } from "react";
 import { Store } from "./Store";
-import { IAction, IEpisode, IEpisodeProps } from "./interfaces";
+import { Link } from "@reach/router";
 
-const EpisodesList = React.lazy<any>(() => import("./EpisodesList"));
-
-const App = (): JSX.Element => {
-  const { state, dispatch } = React.useContext(Store);
-
-  console.log(state);
-
-  React.useEffect(() => {
-    state.episodes.length === 0 && fetchDataAction();
-  }, []);
-
-  const fetchDataAction = async () => {
-    const URL =
-      "https://api.tvmaze.com/singlesearch/shows?q=rick-&-morty&embed=episodes";
-    const data = await fetch(URL);
-    const dataJSON = await data.json();
-    return dispatch({
-      type: "FETCH_DATA",
-      payload: dataJSON._embedded.episodes
-    });
-  };
-
-  const toggleFavAction = (episode: IEpisode): IAction => {
-    const episodeInFav = state.favorites.includes(episode);
-    let dispatchObj = {
-      type: "ADD_FAV",
-      payload: episode
-    };
-    if (episodeInFav) {
-      dispatchObj = {
-        type: "REMOVE_FAV",
-        payload: episode
-      };
-    }
-    return dispatch(dispatchObj);
-  };
-
-  const props: IEpisodeProps = {
-    episodes: state.episodes,
-    toggleFavAction,
-    favorites: state.favorites
-  };
+const App = (props: any): JSX.Element => {
+  const { state } = React.useContext(Store);
 
   return (
     <>
@@ -52,13 +12,12 @@ const App = (): JSX.Element => {
           <h1>Rick and Morty</h1>
           <p>Pick your favorite episode!</p>
         </div>
-        <div>Favorites: {state.favorites.length}</div>
+        <div>
+          <Link to="/">Home</Link>
+          <Link to="/faves">Favorites: {state.favorites.length}</Link>
+        </div>
       </header>
-      <React.Suspense fallback={<div>...loading</div>}>
-        <section className="episode-layout">
-          <EpisodesList {...props} />
-        </section>
-      </React.Suspense>
+      {props.children}
     </>
   );
 };
